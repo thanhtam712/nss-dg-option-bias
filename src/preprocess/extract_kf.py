@@ -99,6 +99,17 @@ def process_video_uniform(
     video_dir = video_path.stem
     cap = cv.VideoCapture(str(video_path))
     
+    # Check video duration
+    fps = cap.get(cv.CAP_PROP_FPS)
+    total_frames = int(cap.get(cv.CAP_PROP_FRAME_COUNT))
+    duration_seconds = total_frames / fps if fps > 0 else 0
+    duration_minutes = duration_seconds / 60
+    
+    if duration_minutes > 3:
+        print(f"Skipping video {video_path.name}: duration {duration_minutes:.2f} minutes > 3 minutes")
+        cap.release()
+        return
+    
     total_frames = int(cap.get(cv.CAP_PROP_FRAME_COUNT))
     
     # Calculate frame step if num_frames is specified
@@ -152,6 +163,17 @@ def process_video(
     video_dir = video_path.stem
     # msb_df = pd.read_csv(msb_path, sep="\t")
     cap = cv.VideoCapture(str(video_path))
+
+    # Check video duration
+    fps = cap.get(cv.CAP_PROP_FPS)
+    total_frames = int(cap.get(cv.CAP_PROP_FRAME_COUNT))
+    duration_seconds = total_frames / fps if fps > 0 else 0
+    duration_minutes = duration_seconds / 60
+    
+    if duration_minutes > 3:
+        print(f"Skipping video {video_path.name}: duration {duration_minutes:.2f} minutes > 3 minutes")
+        cap.release()
+        return
 
     total_frame_read = 0
     kf_features = []
@@ -261,10 +283,19 @@ def main():
         with open(args.input, "r") as f:
             video_list = [line.strip() for line in f if line.strip()]
     else:
-        video_list = os.listdir(folder_name)
-
+        vid_list = list(Path(folder_name).glob("**/*.mp4"))
+        folder_vid_existed = list(Path("data/videos_filtered").glob("*.mp4"))
+        folder_vid_existed = [vid.name for vid in folder_vid_existed] + [
+            vid.name for vid in Path("data/keyframes_full").iterdir()
+        ]
+        
+        video_list = []
+        for vid in vid_list:
+            if vid.name not in folder_vid_existed:
+                video_list.append(str(vid))
+                
     random.shuffle(video_list)
-
+    
     # Process videos
     print(f"Total videos: {len(video_list)}")
     print(f"Extraction mode: {mode}")
@@ -273,7 +304,8 @@ def main():
     else:
         print(f"Frame step: {frame_step}")
 
-    for _, video_id in enumerate(video_list):
+    # for _, video_id in enumerate(video_list):
+    for video_id in video_list:
         z = video_id
         if "." in z:
             z = video_id.split(".")[0]
@@ -320,7 +352,9 @@ def main():
                 )
         else:
             print("Video not found:", video_id)
-
+            
+        if len(list(Path(output_dir).iterdir())) == 400:
+            break
 
 if __name__ == "__main__":
     main()

@@ -495,9 +495,9 @@ if __name__ == "__main__":
     print(f"Using caption bias reduction: {args.use_bias_reduction}, alpha: {args.alpha}, top_k: {args.top_k}")
     model, processor = load_model(args.model_id)
     
-    layer_ranges = [[18, 35]]  # Example: apply hooks only on layers 0-3 and 8-11
+    layer_ranges = [[19, 33]]  # Example: apply hooks only on layers 0-3 and 8-11
     topk_list = [20]
-    alpha_values = [0.06]
+    alpha_values = [0.03]
     data = json.load(open(args.data_path, 'r'))
 
     for layer_range in layer_ranges:

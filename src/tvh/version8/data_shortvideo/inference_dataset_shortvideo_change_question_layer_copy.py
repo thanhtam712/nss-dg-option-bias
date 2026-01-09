@@ -12,7 +12,6 @@ import json
 import functools, builtins
 print = functools.partial(builtins.print, flush=True)
 
-
 model_path = 'Qwen/Qwen2.5-VL-3B-Instruct'
 
 class CaptionBiasReducer:

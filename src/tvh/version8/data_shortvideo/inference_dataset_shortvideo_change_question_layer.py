@@ -42,7 +42,7 @@ class CaptionBiasReducer:
         Returns: (image_indices, question_indices, caption_indices)
         """
         tokens = self.processor.tokenizer.convert_ids_to_tokens(input_ids[0])
-        print(tokens)
+        # print(tokens)
         # Find vision token boundaries
         vision_start_idx = None
         vision_end_idx = None
@@ -240,6 +240,7 @@ class CaptionBiasReducer:
             
             # Compute mean adjustment vector
             v = torch.stack(differences, dim=0).mean(dim=0)  # [batch, hidden]
+            v = torch.nn.functional.normalize(v, p=2, dim=-1)  # Chuẩn hóa trước khi cộng
             
             # Update both question and caption tokens (only valid ones)
             text_indices = valid_question_indices + valid_caption_indices
@@ -507,9 +508,9 @@ if __name__ == "__main__":
     print(f"Using caption bias reduction: {args.use_bias_reduction}, alpha: {args.alpha}, top_k: {args.top_k}")
     model, processor = load_model(args.model_id)
     
-    layer_ranges = [[18, 35]]  # Apply to all layers
-    topk_list = [20]
-    alpha_values = [0.03, 0.04, 0.05, 0.06]
+    layer_ranges = [[19, 33], [0, 35]]  # Apply to all layers
+    topk_list = [20, 10]
+    alpha_values = [0.1, 0.15, 0.2, 0.3, 0.4]
     data = json.load(open(args.data_path, 'r'))
     print(f"last token question, defaul ""?)")
 
@@ -534,7 +535,7 @@ if __name__ == "__main__":
                     outline_answer_id = item["outline_answer_id"]
                     outline_information = item["outline_caption"]
                     
-                    number_of_samples += 1
+                    
                     image_dir = Path(args.folder_image_path)
                     images = [str(img) for img in (image_dir / video_id).glob("*.jpg")]
 
@@ -546,7 +547,7 @@ Answer options:
 2: {item['answer_choice_2']}       
 3: {item['answer_choice_3']}
 4: {item['answer_choice_4']}
-Caption: {caption_reasoning}"""
+Caption: {outline_information}"""
                     if args.compare:
                         print("="*80)
                         try:
@@ -560,7 +561,8 @@ Caption: {caption_reasoning}"""
                         except Exception as e:
                             print(f"Error processing sample {video_id}: {e}")
                             continue
-
+                        
+                        number_of_samples += 1
                         # base line result
                         try:
                             if int(result_baseline) == int(answer_choices):

@@ -18,7 +18,7 @@ from io import BytesIO
 # from qwen_vl_utils import process_vision_info
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-from src.prompt_question import prompt_case1, prompt_case2, prompt_case3, prompt_case4, prompt_case5
+from prompt.prompt_question import prompt_case1, prompt_case2, prompt_case3, prompt_case4, prompt_case5
 
 from VTI.llava.eval.run_llava import eval_model
 from VTI.llava.utils import disable_torch_init

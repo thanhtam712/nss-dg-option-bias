@@ -1,3 +1,21 @@
+prompt_user = """
+Question:
+{question}
+
+Answer options:
+{options}
+
+Here are some additional information which are text descriptions based on the image to assist you for answering the later question. Note, the information could be irrelevant, missing some information or inaccurate, please use it with caution: {caption}
+"""
+
+prompt_user_no_caption = """
+Question:
+{question}
+
+Answer options:
+{options}
+"""
+
 prompt_case1 = """
 Question:
 {question}
