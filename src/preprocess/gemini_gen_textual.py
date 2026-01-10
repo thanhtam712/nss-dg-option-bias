@@ -12,12 +12,12 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-from prompt.prompt_gen_textual import system_redirected, user_redirected, system_completely_wrong, user_completely_wrong, system_partially_wrong, user_paritially_wrong
+from prompt.prompt_gen_caption import system_redirected, user_redirected, system_contradictory, user_contradictory, system_off_question, user_off_question
 
 load_dotenv()
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Generate textuals using Gemini API")
+    parser = argparse.ArgumentParser(description="Generate captions using Gemini API")
     parser.add_argument("--images-root", type=str, required=True, help="Path to video frames folder")
     parser.add_argument("--question-path", type=str, required=True, help="Path to questions JSON file")
     parser.add_argument("--json-generated", type=str, default="", required=False, help="Path to previously generated JSONL file to resume from")
@@ -41,22 +41,22 @@ def load_llm():
     client = genai.Client(api_key=api_key)
     return client
 
-def generate_textual_redirected(client, question, answer_correct, textual_reasoning, answer_redirected):
+def generate_caption_redirected(client, question, answer_correct, caption_reasoning, answer_redirected):
     """
-    Generate textual hallucination using both image and text.
+    Generate caption hallucination using both image and text.
     
     Args:
         client: Gemini client
         question: Question text
         answer_correct: Correct answer
-        textual_reasoning: Reasoning for correct answer
+        caption_reasoning: Reasoning for correct answer
         answer_redirected: Answer to redirect to (hallucination)
         image_path: Path to image file
     
     Returns:
-        Generated textual
+        Generated caption
     """
-    prompt = f"{system_redirected}\n\n{user_redirected.format(question=question, answer_correct=answer_correct, textual_reasoning=textual_reasoning, answer_redirected=answer_redirected)}"
+    prompt = f"{system_redirected}\n\n{user_redirected.format(question=question, answer_correct=answer_correct, caption_reasoning=caption_reasoning, answer_redirected=answer_redirected)}"
     
     contents = []
     contents.append(types.Part(text=prompt))
@@ -77,9 +77,9 @@ def generate_textual_redirected(client, question, answer_correct, textual_reason
     return response.text.strip()
 
 
-def generate_textual_completely_wrong(client, question, list_answers: list = None):
+def generate_caption_completely_wrong(client, question, len_caption_reasoning, list_answers: list = None):
     """
-    Generate textual completely wrong using both image and text.
+    Generate caption completely wrong using both image and text.
     
     Args:
         client: Gemini client
@@ -87,10 +87,10 @@ def generate_textual_completely_wrong(client, question, list_answers: list = Non
         list_answers: List of answer choices
     
     Returns:
-        Generated textual completely wrong
+        Generated caption completely wrong
     """
     list_answers_str = "\n".join(ans for ans in list_answers) if list_answers else ""
-    prompt = f"{system_completely_wrong}\n\n{user_completely_wrong.format(question=question, list_answers_str=list_answers_str)}"
+    prompt = f"{system_contradictory}\n\n{user_contradictory.format(question=question, len_caption_reasoning=len_caption_reasoning, list_answers_str=list_answers_str)}"
     
     def generate():
         return client.models.generate_content(
@@ -108,9 +108,9 @@ def generate_textual_completely_wrong(client, question, list_answers: list = Non
     return response.text.strip()
 
 
-def generate_textual_partially_wrong(client, question, list_answers: list, images_path: str = None):
+def generate_caption_partially_wrong(client, question, list_answers: list, len_caption_reasoning, images_path: str = None):
     """
-    Generate textual hallucination using both image and text.
+    Generate caption hallucination using both image and text.
     
     Args:
         client: Gemini client
@@ -119,11 +119,11 @@ def generate_textual_partially_wrong(client, question, list_answers: list, image
         images_path: List of image file paths
     
     Returns:
-        Generated textual
+        Generated caption
     """
     print(images_path)
     list_answers_str = "\n".join(ans for ans in list_answers)
-    prompt = f"{system_partially_wrong}\n\n{user_paritially_wrong.format(question=question, list_answers_str=list_answers_str)}"
+    prompt = f"{system_off_question}\n\n{user_off_question.format(question=question, len_caption_reasoning=len_caption_reasoning, list_answers_str=list_answers_str)}"
     parts = []
 
     # Ensure images_path is a list of valid file paths
@@ -202,7 +202,7 @@ def load_samples(video_path: Path, question_path: Path, answer_path: Path):
             "correct_answer_id": data_answer["predictive"]["answer"],
             "reasoning": data_question["predictive"]["reason"][data_answer["predictive"]["reason"]],
             "outline_answer_id": random_outline_answer_id(data_answer["predictive"]["answer"]),
-            "outline_textual": ""
+            "outline_caption": ""
         },
         {
             "video_id": video_id,
@@ -215,7 +215,7 @@ def load_samples(video_path: Path, question_path: Path, answer_path: Path):
             "correct_answer_id": data_answer["counterfactual"]["answer"],
             "reasoning": data_question["counterfactual"]["reason"][data_answer["counterfactual"]["reason"]],
             "outline_answer_id": random_outline_answer_id(data_answer["counterfactual"]["answer"]),
-            "outline_textual": ""
+            "outline_caption": ""
         }
     ]
 
@@ -286,7 +286,7 @@ def main():
     images_root = args.images_root
     
     Path(answer_path).parent.mkdir(parents=True, exist_ok=True)
-    backup_file = answer_path.replace(".json", "_gemini_textual_backup.json")
+    backup_file = answer_path.replace(".json", "_gemini_caption_backup.json")
     f_save = open(backup_file, "a+")
 
     samples = json.load(open(question_path, "r"))
@@ -301,7 +301,7 @@ def main():
     
     dict_generated = samples_generated(args.json_generated) if args.json_generated else {}
     
-    for item in tqdm(samples, desc="Generating textuals", total=len(samples)):
+    for item in tqdm(samples, desc="Generating captions", total=len(samples)):
         if item["image_id"] in dict_generated:
             continue
         
@@ -333,53 +333,55 @@ def main():
                 image_paths = str(Path(images_root) / item["image_id"])
                 print(f"Using image path: {image_paths}")
             
-            textual_redirected = generate_textual_redirected(
+            caption_redirected = generate_caption_redirected(
                 client=client,
                 question=question,
                 answer_correct=answer_choice_correct,
-                textual_reasoning=reasoning,
+                caption_reasoning=reasoning,
                 answer_redirected=answer_choice_outline,
             )
             
             time.sleep(6)
             
-            textual_completely_wrong = generate_textual_completely_wrong(
+            caption_completely_wrong = generate_caption_completely_wrong(
                 client=client,
                 question=question,
+                len_caption_reasoning=len(reasoning),
                 list_answers=[item[f"answer_choice_{i}"] for i in range(num_choices)]
             )
             
             time.sleep(6)
             
-            textual_partially_wrong = generate_textual_partially_wrong(
+            caption_partially_wrong = generate_caption_partially_wrong(
                 client=client,
                 question=question,
+                len_caption_reasoning=len(reasoning),
                 list_answers=[item[f"answer_choice_{i}"] for i in range(num_choices)],
                 images_path=image_paths
             )
             
-            textual_redirected = textual_redirected.replace("textual generated:", "").strip()
-            textual_completely_wrong = textual_completely_wrong.replace("textual generated:", "").strip()
-            textual_partially_wrong = textual_partially_wrong.replace("textual generated:", "").strip()
+            caption_redirected = caption_redirected.replace("caption generated:", "").strip()
+            caption_completely_wrong = caption_completely_wrong.replace("caption generated:", "").strip()
+            caption_partially_wrong = caption_partially_wrong.replace("caption generated:", "").strip()
             
-            print(f"Generated textual redirected: {textual_redirected}")
+            print(f"Generated caption redirected: {caption_redirected}")
             print("-"*50)
-            print(f"Generated textual completely wrong: {textual_completely_wrong}")
+            print(f"Generated caption completely wrong: {caption_completely_wrong}")
             print("-"*50)
-            print(f"Generated textual partially wrong: {textual_partially_wrong}")
+            print(f"Generated caption partially wrong: {caption_partially_wrong}")
             print("-"*50)   
             
-            item["textual_correct"] = item["reasoning"]
-            item["textual_redirected"] = textual_redirected
-            item["textual_completely_wrong"] = textual_completely_wrong
-            item["textual_partially_wrong"] = textual_partially_wrong
-            item["textual_irrelevance"] = random.choice(data_wiki_irrelevant).strip()
+            item["caption_correct"] = item["reasoning"]
+            item["caption_redirected"] = caption_redirected
+            item["caption_completely_wrong"] = caption_completely_wrong
+            item["caption_partially_wrong"] = caption_partially_wrong
+            item["caption_irrelevance"] = random.choice(data_wiki_irrelevant).strip()
             
             f_save.write(json.dumps(item) + "\n")
             f_save.flush()
             
         except Exception as e:
-            print(f"✗ Error generating textual: {e}")
+            print(f"✗ Error generating caption: {e}")
             print(f"Waiting 60 seconds before continuing to next item...")
             time.sleep(60)
             continue
@@ -402,4 +404,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-# python src/preprocess/gemini_gen_textual.py --images-root data/aokvqa/dataset/image/val2017 --question-path data/data_samples/AOK_VQA/preprocessed_aokvqa.json --answer-path data/data_samples/AOK_VQA/baseline_gemini.json 
+# python src/preprocess/gemini_gen_caption.py --images-root data/aokvqa/dataset/image/val2017 --question-path data/data_samples/AOK_VQA/preprocessed_aokvqa.json --answer-path data/data_samples/AOK_VQA/baseline_gemini.json 
