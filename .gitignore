@@ -20,7 +20,7 @@ trained_models/
 wandb/
 README.txt
 .env
-*.png
+# *.png
 *.json
 *.zip
 *.tar
