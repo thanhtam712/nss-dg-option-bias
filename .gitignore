@@ -18,6 +18,7 @@ src/tvh/
 src/test/
 trained_models/
 wandb/
+README.txt
 .env
 *.png
 *.json
