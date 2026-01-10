@@ -9,17 +9,8 @@ Official implementation of "When Helpful Text Hurts: Option-Redirecting Bias fro
 
 Vision–Language Models (VLMs) are increasingly deployed in tri-modal visual question answering, where predictions depend on images, questions, and auxiliary text (captions, OCR, metadata). While auxiliary text often improves performance, it can introduce systematic decision bias when imperfect.
 
-<p align="center">
-  <img src="overview.png" alt="Architecture" width="600">
-</p>
-
 **Key Finding:** The most harmful auxiliary text is not the most incorrect, but the most *question-aligned yet image-inconsistent*—especially when it implicitly supports a specific wrong answer option.
 
-### Main Contributions
-
-- **Textual Reliability Ladder**: A controlled diagnostic framework that factorizes auxiliary-text reliability along three axes: image consistency, question relevance, and option support
-- **Option-Redirecting Text Identification**: Discovery of a particularly damaging regime that induces option-targeted collapse rather than diffuse confusion
-- **Lightweight Inference-Time Intervention**: A two-stage steering method (NSS + DG) that mitigates option-targeted failures without degrading performance under reliable text
 
 ## 🏗️ Architecture
 
@@ -27,6 +18,10 @@ Our method consists of two stages:
 
 1. **Stage 1 - Noise-Stability Steering (NSS)**: Global, static representation shift derived from paired correct/incorrect demonstrations
 2. **Stage 2 - Dynamic Grounding (DG)**: Instance-wise, question-aware correction that realigns auxiliary text with visual evidence
+
+<p align="center">
+  <img src="pipeline_method.jpg" alt="Architecture" width="600">
+</p>
 
 ## 📊 Textual Reliability Ladder
 
@@ -73,35 +68,29 @@ We evaluate on the following open-source VLMs:
 
 ### Option A: Using Pre-generated Data (Recommended)
 
-1. Download the pre-generated data from Google Drive
+1. Download the pre-created .zip file data from Google Drive.
+- [sample file .zip](https://drive.google.com/file/d/1p08HnPgdmGNLkNrT6dpqkZ_hn5QNxczA/view?usp=sharing)
+- [data .zip](https://drive.google.com/file/d/1H-dXWVWJgqeXz37DjLCw4bZPh1wEZR-e/view?usp=sharing)
 2. Extract to the following structure:
 
 ```
 repo/
 ├── data/
-│   └── <dataset>/
-│       └── <sample file .json>/
-│       └── <image folder>/
-│       └── <metadata file .json>/
-
+│   └── data_samples/
+│       └── <dataset>/
+│           └── <image folder>/
+│           └── <metadata file .json>/
 ├── NSS_DG/
 │   └── experiments/
+│       └── data/
+│           └── <dataset>/
+│               └── <example file .json>
 │       └── eval/
 │           └── internvl.py
 │           └── qwen.py
 └── src/
     └── preprocess/
         └── [preprocess files]
-```
-
-3. Unzip archives:
-
-```bash
-# Unzip all data files
-find ~/Downloads/nss_data -type f -name '*.zip' -exec unzip -o {} -d . \;
-
-# Extract tar.gz files
-find ~/Downloads/nss_data -type f \( -name '*.tar.gz' -o -name '*.tgz' \) -exec tar -xzf {} -C . \;
 ```
 
 ### Option B: Generate Textual Data
@@ -115,7 +104,9 @@ python src/preprocess/gemini_gen_textual.py \
   --answer-path <output_json>
 ```
 
-**Note**: The script generates `textual_*` fields. Map `textual_redirected` → `caption_redirected` for compatibility.
+**Note**: Some of the textual names in the paper differ from those in this code.
+`Faithful` →  `caption_correct`, `Off-Question` → `caption_partially_wrong`, `Contradictory` → `caption_completely_wrong`, `Option-Redirecting` → `caption_redirected`, `Irrelevant` → `caption_irrelevance`
+
 
 ### Build NSS Demo Samples
 
@@ -225,7 +216,7 @@ We thank the creators of A-OKVQA, ScienceQA, VCR, and Causal-VidQA datasets, and
 
 ## 📧 Contact
 
-For questions or issues, please open an issue on GitHub or contact [tranvanhoangdpe@example.com](mailto:email@example.com).
+For questions or issues, please open an issue on GitHub or contact [tranvanhoangdpe@gmail.com](mailto:email@example.com),[lethithanhtam071205@gmail.com](mailto:email@example.com).
 
 ---
 
