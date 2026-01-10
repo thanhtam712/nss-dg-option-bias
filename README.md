@@ -19,9 +19,10 @@ Our method consists of two stages:
 1. **Stage 1 - Noise-Stability Steering (NSS)**: Global, static representation shift derived from paired correct/incorrect demonstrations
 2. **Stage 2 - Dynamic Grounding (DG)**: Instance-wise, question-aware correction that realigns auxiliary text with visual evidence
 
-<p align="center">
-  <img src="pipeline_method.jpg" alt="Architecture" width="600">
-</p>
+<figure align="center">
+  <img src="pipeline_method.jpg" width="1000">
+  <figcaption><b>Figure 1.</b> Pipeline method NSS+DG</figcaption>
+</figure>
 
 ## 📊 Textual Reliability Ladder
 
@@ -84,7 +85,7 @@ repo/
 │   └── experiments/
 │       └── data/
 │           └── <dataset>/
-│               └── <example file .json>
+│               └── <xample file .json>
 │       └── eval/
 │           └── internvl.py
 │           └── qwen.py
