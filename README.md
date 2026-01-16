@@ -217,7 +217,7 @@ We thank the creators of A-OKVQA, ScienceQA, VCR, and Causal-VidQA datasets, and
 
 ## 📧 Contact
 
-For questions or issues, please open an issue on GitHub or contact [tranvanhoangdpe@gmail.com](mailto:email@example.com),[lethithanhtam071205@gmail.com](mailto:email@example.com).
+For questions or issues, please open an issue on GitHub or contact [tranvanhoangdpe@gmail.com](mailto:email@example.com),  [lethithanhtam071205@gmail.com](mailto:email@example.com).
 
 ---
 

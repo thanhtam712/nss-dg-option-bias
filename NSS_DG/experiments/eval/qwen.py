@@ -757,7 +757,7 @@ def eval_model(args):
     print("=" * 80)
     
     # Calculate accuracy metrics
-    total_samples = len(samples)
+    total_samples = 1000  # Since we processed only last 1000 samples
     accuracy_caption_true = count1 / total_samples * 100
     accuracy_caption_completely_wrong = count2 / total_samples * 100
     accuracy_caption_partially_wrong = count3 / total_samples * 100
