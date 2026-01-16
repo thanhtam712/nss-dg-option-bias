@@ -21,7 +21,7 @@ Our method consists of two stages:
 
 <figure align="center">
   <img src="pipeline_method.jpg" width="1000">
-  <figcaption><b>Figure 1.</b> Pipeline method NSS+DG</figcaption>
+  <figcaption><b>Figure 1.</b> Pipeline two stage NSS+DG</figcaption>
 </figure>
 
 ## 📊 Textual Reliability Ladder
