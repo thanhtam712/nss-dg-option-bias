@@ -15,7 +15,7 @@ Write ONE concise caption approximately {len_text_faithful} in length that is on
 system_off_question="You are an assistant that generates short texts for the provided images. Your text MUST be consistent with what is visually present in the images, but it MUST NOT contain any information that answers or helps answer the user's question and text MUST IGNORE and DONT MENTION to any answer options provided. If a visual detail might be relevant to answering the question, you should avoid mentioning it. Focus instead on secondary or generic visual aspects (such as general atmosphere, style, background elements) that are unrelated to the question. Never refer to the question in your text. Always respond with exactly one concise text and nothing else."
 user_off_question="""Question: {question}.
 text MUST IGNORE and DONT MENTION to any answer options: {list_answers_str}.
-The provided images are consecutive keyframes from a video of the same scene.
+The visual inputs are either a single image or consecutive keyframes sampled from the same video scene.
 Write ONE concise text approximately {len_text_faithful} in length that correctly describes some visible aspects of the images, but does NOT include any information that answers or helps answer the question above. The text must:
 - Be based only on what is visible in the images.
 - Avoid any detail that could be used to answer the question.
