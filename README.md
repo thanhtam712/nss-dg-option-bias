@@ -215,10 +215,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 We thank the creators of A-OKVQA, ScienceQA, VCR, and Causal-VidQA datasets, and the developers of InternVL and Qwen models.
 
-## 📧 Contact
-
-For questions or issues, please open an issue on GitHub or contact [tranvanhoangdpe@gmail.com](mailto:email@example.com),  [lethithanhtam071205@gmail.com](mailto:email@example.com).
-
 ---
 
 **Note**: This is research code. For production deployment, additional robustness testing and safety considerations are recommended.
