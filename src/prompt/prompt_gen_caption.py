@@ -1,4 +1,4 @@
-system_redirected="You are an assistant that generates text hallucinations redirected to a specific answer for a question based on the provided image."
+system_redirected="You are an assistant that generates text hallucinations redirected to a specific answer for a question."
 user_redirected="""Question: {question}.
 Follow structure of this answer:
 Answer redirected: {answer_correct}
