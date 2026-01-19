@@ -77,7 +77,7 @@ def generate_caption_redirected(client, question, answer_correct, caption_reason
     return response.text.strip()
 
 
-def generate_caption_completely_wrong(client, question, len_caption_reasoning, list_answers: list = None):
+def generate_caption_completely_wrong(client, question, list_answers: list = None):
     """
     Generate caption completely wrong using both image and text.
     
@@ -90,7 +90,7 @@ def generate_caption_completely_wrong(client, question, len_caption_reasoning, l
         Generated caption completely wrong
     """
     list_answers_str = "\n".join(ans for ans in list_answers) if list_answers else ""
-    prompt = f"{system_contradictory}\n\n{user_contradictory.format(question=question, len_caption_reasoning=len_caption_reasoning, list_answers_str=list_answers_str)}"
+    prompt = f"{system_contradictory}\n\n{user_contradictory.format(question=question, list_answers_str=list_answers_str)}"
     
     def generate():
         return client.models.generate_content(
@@ -108,7 +108,7 @@ def generate_caption_completely_wrong(client, question, len_caption_reasoning, l
     return response.text.strip()
 
 
-def generate_caption_partially_wrong(client, question, list_answers: list, len_caption_reasoning, images_path: str = None):
+def generate_caption_partially_wrong(client, question, list_answers: list, images_path: str = None):
     """
     Generate caption hallucination using both image and text.
     
@@ -123,7 +123,7 @@ def generate_caption_partially_wrong(client, question, list_answers: list, len_c
     """
     print(images_path)
     list_answers_str = "\n".join(ans for ans in list_answers)
-    prompt = f"{system_off_question}\n\n{user_off_question.format(question=question, len_caption_reasoning=len_caption_reasoning, list_answers_str=list_answers_str)}"
+    prompt = f"{system_off_question}\n\n{user_off_question.format(question=question, list_answers_str=list_answers_str)}"
     parts = []
 
     # Ensure images_path is a list of valid file paths
@@ -346,7 +346,6 @@ def main():
             caption_completely_wrong = generate_caption_completely_wrong(
                 client=client,
                 question=question,
-                len_caption_reasoning=len(reasoning),
                 list_answers=[item[f"answer_choice_{i}"] for i in range(num_choices)]
             )
             
@@ -355,7 +354,6 @@ def main():
             caption_partially_wrong = generate_caption_partially_wrong(
                 client=client,
                 question=question,
-                len_caption_reasoning=len(reasoning),
                 list_answers=[item[f"answer_choice_{i}"] for i in range(num_choices)],
                 images_path=image_paths
             )
