@@ -5,6 +5,8 @@
 
 Official implementation of "When Helpful Text Hurts: Option-Redirecting Bias from Auxiliary Text in Vision–Language Models".
 
+Oral accepted in ACMMM 2026, Link paper: (https://arxiv.org/pdf/2609.32489)
+
 ## 📋 Overview
 
 Vision–Language Models (VLMs) are increasingly deployed in tri-modal visual question answering, where predictions depend on images, questions, and auxiliary text (captions, OCR, metadata). While auxiliary text often improves performance, it can introduce systematic decision bias when imperfect.
