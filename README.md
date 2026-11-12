@@ -5,7 +5,7 @@
 
 Official implementation of "When Helpful Text Hurts: Option-Redirecting Bias from Auxiliary Text in Vision–Language Models".
 
-Oral accepted in ACMMM 2026, Link paper: (https://arxiv.org/pdf/2609.32489)
+Oral accepted in ACMMM 2026, Link paper: (https://arxiv.org/pdf/2609.32489 | https://dl.acm.org/doi/10.1145/3767308.3836232)
 
 ## 📋 Overview
 
